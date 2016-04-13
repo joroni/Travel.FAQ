@@ -38,7 +38,7 @@ config.localDBCountryTable = 'country_detail';
 config.remoteServerAddress = "http://icokecontent.chinacloudapp.cn/store/travelfaq/";
 config.remoteDataFileName = "TravelFAQData.xml";
 config.remoteDataFlagsFolder = "flags";
-config.remoteConnectTimeout = 5000;
+config.remoteConnectTimeout = 7000;
 
 config.geoLatSearchKey = '<latitude>';
 config.geoLngSearchKey = '<longitude>';

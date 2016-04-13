@@ -16,34 +16,93 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+ 
+/**
+ * Author,email :     Aldrin Rasdas , arasdas@coca-cola.com
+ * Date Create  :     April, 2014
+ * Description  :     Contains methods/functions that deal mainly remote data
+ *
+ * REVISION HISTORY
+ *
+ * Author,email :	Raymund Niconi , niconi@coca-cola.com
+ * Date Revised :	April, 2016
+ * Description  :	Contains methods/functions that deal mainly remote data, UI enhancements and transitions
+ *
+ **/
+
+ 
 var app = {
-    // Application Constructor
-    initialize: function() {
-        this.bindEvents();
+    // Application Constructor	
+	
+    initialize: function() {		
+        this.bindEvents();   
+		$.support.cors = true;
+		$.mobile.allowCrossDomainPages = true;
+		appUI.initialize();
     },
     // Bind Event Listeners
     //
     // Bind any events that are required on startup. Common events are:
     // 'load', 'deviceready', 'offline', and 'online'.
-    bindEvents: function() {
-        document.addEventListener('deviceready', this.onDeviceReady, false);
+    bindEvents: function() {   
+		if (isDesktop()) {
+			$(document).ready(function(e) {
+				app.onDeviceReady();
+            });
+		}
+		
+		document.addEventListener('deviceready', this.onDeviceReady, false);
+		document.addEventListener('menubutton', function() { appUI.slideOptions();}, false);				
+		document.addEventListener('searchbutton', function() { appUI.slideCountries(); }, false);
+		window.addEventListener('resize', function() {appUI.resizeContent(); appUI.resizeCountryList();},false);
+		window.addEventListener('orientationchange', function() {appUI.arrangeScreenLayout();},false);
+        
     },
     // deviceready Event Handler
     //
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
-    // function, we must explicitly call 'app.receivedEvent(...);'
-    onDeviceReady: function() {
-        app.receivedEvent('deviceready');
-    },
+    // function, we must explicity call 'app.receivedEvent(...);'
+		
+	onDeviceReady: function() {	
+		document.addEventListener("online", 
+		function() {
+			D('Connection established.');
+			appUI.checkUpdate();
+		},
+		false);
+			
+		if (window.requestFileSystem) {
+			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, 
+				function(fs) {
+					var pf = "Android";
+					try {
+						pf = device ? device.platform : null;				
+					} catch(err) {}	
+										
+					
+					config.fileSystemRootFolder = fs.root.toURL();
+					if (pf=="Android") config.fileSystemRootFolder = cordova.file.externalApplicationStorageDirectory;
+				});	
+		}		
+		
+		//bind alert to dialogs plugin
+		if (navigator.notification) {
+			window.alert = function(msg) {
+				navigator.notification.alert(
+					msg,  // message
+					function() {},         // callback
+					config.appTitle,            // title
+					'OK'                  // buttonName
+				);			
+			}
+		}
+		
+		//appUI.launchFirstScreen();
+		appUI.setUserScreen();		
+	},
     // Update DOM on a Received Event
     receivedEvent: function(id) {
-        var parentElement = document.getElementById(id);
-        var listeningElement = parentElement.querySelector('.listening');
-        var receivedElement = parentElement.querySelector('.received');
+    },
+	
 
-        listeningElement.setAttribute('style', 'display:none;');
-        receivedElement.setAttribute('style', 'display:block;');
-
-        console.log('Received Event: ' + id);
-    }
 };
